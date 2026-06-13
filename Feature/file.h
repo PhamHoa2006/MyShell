@@ -11,8 +11,21 @@
 #include <windows.h>
 #include <conio.h>
 #include <fstream>
+
+
+
 using namespace std;
 namespace fs = std::filesystem;
+
+// Đã có các hàm :     
+// - checkFileExistence: Kiểm tra sự tồn tại của một hay nhiều file
+// - createFile: Tạo một hoặc nhiều file
+// - deleteFile: Xóa một hoặc nhiều file
+// - openFile: Mở một hoặc nhiều file
+// - renameFile: Đổi tên một hoặc nhiều file
+// - writeFile: Ghi nội dung vào một hoặc nhiều file (chưa viết xong)
+
+
 class FileManager {
 public:
     FileManager();
@@ -101,7 +114,7 @@ public:
             file << content << endl;
             file.close();
         }
-        
+
     }
 
 
