@@ -34,15 +34,7 @@ vector<string> split_input(const string& input){
     while (ss >> token) {
         tokens.push_back(token);
     }
-
-    // Giải quyết alias cho lệnh đầu tiên
-    if (!tokens.empty()) {
-        const string& first_token = tokens[0];
-        if (first_token == "cls") {
-            tokens[0] = "clear";
-        }
-    }
-
+    
     return tokens;
 }
 
