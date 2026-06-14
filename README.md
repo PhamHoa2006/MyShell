@@ -6,6 +6,8 @@ A command-line shell built in C++ for the Operating System course.
 
 > TODO: Xuan Son, Pham Hoa, Viet Tung, Pham Khanh
 
+**👉 See [TEAM_TASKS.md](TEAM_TASKS.md) for how the workload is divided among the 4 team members.**
+
 ## Project Structure
 
 ```
