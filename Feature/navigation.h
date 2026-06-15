@@ -24,6 +24,7 @@
 #include <iostream>
 #include <iomanip>
 
+using namespace std;
 namespace fs = std::filesystem;
 
 // --- cd <path> ---
@@ -39,6 +40,35 @@ void changeDirectory(const std::vector<std::string>& args)
     // 3. Check if it's a directory → fs::is_directory(args[0])
     // 4. Change directory → fs::current_path(args[0])
     // 5. Handle exceptions with try/catch
+    if (args.empty()) {
+        cerr << "Usage: cd <path>" << endl;
+        return;
+    }
+    fs::path newPath = args[0];
+    if (newPath == ".") {
+        // Stay in the current directory
+        return;
+    }
+    else if (newPath == "..") {
+        // Move up to the parent directory
+        newPath = fs::current_path().parent_path();
+        return;
+    }
+    try {
+        if (!fs::exists(newPath)) {
+            cerr << "Path does not exist: " << newPath << endl;
+            return;
+        }
+        if (!fs::is_directory(newPath)) {
+            cerr << "Path is not a directory: " << newPath << endl;
+            return;
+        }
+        fs::current_path(newPath);
+    } catch (const std::exception& e) {
+        cerr << "Error occurred while changing directory: " << e.what() << endl;
+    }
+
+
 }
 
 // --- pwd ---
@@ -48,6 +78,8 @@ void printWorkingDirectory(const std::vector<std::string>& args)
 {
     // TODO: Implement this function
     // Just one line: cout << fs::current_path() << endl;
+    cout << fs::current_path() << endl;
+
 }
 
 // --- dir [path] ---
@@ -65,6 +97,31 @@ void listDirectoryContents(const std::vector<std::string>& args)
     // 4. For each entry, print:
     //    - [DIR] if it's a directory, [FILE] if it's a file
     //    - The entry name
+    //    - Date modified (optional, can be added later)
+    //    - File or directory size (optional, can be added later)
+    fs::path dirPath = args.empty() ? fs::current_path() : args[0];
+    try {
+        if (!fs::exists(dirPath)) {
+            cerr << "Path does not exist: " << dirPath << endl;
+            return;
+        }
+        if (!fs::is_directory(dirPath)) {
+            cerr << "Path is not a directory: " << dirPath << endl;
+            return;
+        }
+        for (const auto& entry : fs::directory_iterator(dirPath)) {
+            if (entry.is_directory()) {
+                
+                cout << "[DIR]  " << entry.path().filename().string() << endl;
+            } else if (entry.is_regular_file()) {
+                cout << "[FILE] " << entry.path().filename().string() << endl;
+            } else {
+                cout << "[OTHER] " << entry.path().filename().string() << endl;
+            }
+        }
+    } catch (const std::exception& e) {
+        cerr << "Error occurred while listing directory contents: " << e.what() << endl;
+    }
 }
 
 #endif // NAVIGATION_H
