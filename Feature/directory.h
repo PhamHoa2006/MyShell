@@ -24,12 +24,19 @@
 #include <vector>
 #include <filesystem>
 #include <iostream>
+#include <unordered_set>
 using namespace std;
 namespace fs = filesystem;
 
 class DirectoryManager
 {
 public:
+    static const unordered_set<string> supportedCommands;
+
+    static const unordered_set<string> &getSupportedCommands()
+    {
+        return supportedCommands;
+    }
     // --- create_dir <path> ---
     void createDirectory(const vector<string>& args)
     {
@@ -228,5 +235,13 @@ private:
         }
     }
 };
+
+const unordered_set<string> DirectoryManager::supportedCommands = {
+    "copy",
+    "create",
+    "delete",
+    "list_tree",
+    "move"};
+
 
 #endif // DIRECTORY_H

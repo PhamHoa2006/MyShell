@@ -17,7 +17,7 @@ namespace fs = std::filesystem;
 class FileManager {
 public:
     FileManager(){};
-    
+    static const unordered_set<string> supportedCommands;
     static const unordered_set<string>& getSupportedCommands(){
         return supportedCommands;
     };
@@ -255,7 +255,9 @@ public:
     }
 }
 private:
-    inline static const unordered_set<string> supportedCommands = {
+    
+};
+const unordered_set<string> FileManager::supportedCommands= {
         "write_file",
         "read_file",
         "size_file",
@@ -263,6 +265,4 @@ private:
         "open",
         "rename"
     };
-};
-
 #endif // FILE_H
