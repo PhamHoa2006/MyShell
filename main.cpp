@@ -4,13 +4,18 @@
 #include <vector>
 #include <sstream>
 
-// Include your new process.h
+// Include your new process.h and Role 2's headers
 #include "Feature/process.h" 
+#include "Feature/navigation.h"
+#include "Feature/file.h"
+#include "Feature/directory.h"
 
 using namespace std;    
 
-// Initialize the ProcessManager globally or inside main
+// Initialize the Managers globally or inside main
 ProcessManager pm;
+FileManager fm;
+DirectoryManager dm;
 
 void print_startup_info() {
     DWORD pid = GetCurrentProcessId();
@@ -19,7 +24,10 @@ void print_startup_info() {
     cout << "========================================" << endl;
     cout << "Welcome to MyShell (Testing Branch 'Son')" << endl;
     cout << "PID of MyShell: " << pid << endl;
-    cout << "Test commands: start_foreground, start_background, terminate, suspend, resume, list_background, list_all_processes, exit" << endl;
+    cout << "Process commands: start_foreground, start_background, terminate, suspend, resume, list_background, list_all_processes, exit" << endl;
+    cout << "Navigation commands: cd, pwd, dir" << endl;
+    cout << "File commands: mkfile, del, cat, write, move, rename, start, size" << endl;
+    cout << "Directory commands: mkdir, rmdir, cpdir, mvdir, tree" << endl;
     cout << "========================================" << endl;
 }
 
@@ -39,6 +47,46 @@ void execute_command(const string& command, const vector<string>& args){
         pm.listBackgroundProcesses(args);
     } else if (command == "list_all_processes") {
         pm.listProcesses(args);
+        
+    // --- NAVIGATION COMMANDS (Role 2) ---
+    } else if (command == "cd") {
+        changeDirectory(args);
+    } else if (command == "pwd") {
+        printWorkingDirectory(args);
+    } else if (command == "dir" || command == "ls") {
+        listDirectoryContents(args);
+        
+    // --- FILE COMMANDS (Role 2) ---
+    } else if (command == "mkfile") {
+        fm.createFile(args);
+    } else if (command == "del" || command == "rm") {
+        fm.deleteFile(args);
+    } else if (command == "cat" || command == "type") {
+        fm.readFile(args);
+    } else if (command == "write" || command == "echo") {
+        fm.writeFile(args);
+    } else if (command == "move" || command == "mv") {
+        fm.moveFile(args);
+    } else if (command == "rename" || command == "ren") {
+        fm.renameFile(args);
+    } else if (command == "start") {
+        fm.openFile(args);
+    } else if (command == "size") {
+        fm.fileSize(args);
+
+    // --- DIRECTORY COMMANDS (Role 2) ---
+    } else if (command == "mkdir" || command == "md") {
+        dm.createDirectory(args);
+    } else if (command == "rmdir" || command == "rd") {
+        dm.deleteDirectory(args);
+    } else if (command == "cpdir" || command == "xcopy") {
+        dm.copyDirectory(args);
+    } else if (command == "mvdir") {
+        dm.moveDirectory(args);
+    } else if (command == "tree") {
+        dm.listTree(args);
+
+    // --- EXIT ---
     } else if (command == "exit" || command == "quit") {
         cout << "Exiting testing shell..." << endl;
         exit(0);
