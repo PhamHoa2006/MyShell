@@ -18,16 +18,16 @@ MyShell/
 │   ├── file.h                  # File operations (create, delete, open, rename, write)
 │   ├── directory.h             # Directory operations (create, delete, copy, tree)
 │   ├── navigation.h            # cd, pwd, dir
-│   ├── process.h               # TODO: Process management
-│   ├── environment.h           # TODO: Environment variables
-│   ├── system_utils.h          # TODO: System info (time, CPU, memory)
-│   ├── history.h               # TODO: Command history
-│   └── help.h                  # TODO: Help system
+│   ├── process.h               # Process management (foreground/background, kill, suspend, resume, CTRL+C)
+│   ├── environment.h           # Environment variables (path, addpath, set_env)
+│   ├── system_utils.h          # System info (time, date) + batch file execution
+│   ├── history.h               # Command history
+│   └── help.h                  # Help system
 ├── Process/                    # Separate child process executables
 │   ├── child.cpp               # TODO: Minimal child process
 │   └── countdown.cpp           # TODO: Countdown timer
 ├── Testcase/                   # Test scripts
-│   └── test_basic.bat          # TODO: Test commands
+│   └── test_basic.bat          # Test commands (runs via .bat execution feature)
 ├── LEARN.md                    # 📖 Learning guide — APIs & libraries reference
 └── README.md                   # This file
 ```
@@ -58,8 +58,10 @@ MyShell.exe
 | 3 | File operations | `std::filesystem`, `ShellExecuteA` |
 | 4 | Directory operations | `CreateDirectoryA`, `RemoveDirectoryA`, recursive traversal |
 | 5 | Process management | `CreateProcess`, `TerminateProcess`, `WaitForSingleObject` |
-| 6 | Environment variables | `getenv`, `_putenv_s` |
-| 7 | System utilities | `GetLocalTime`, `GlobalMemoryStatusEx`, `GetSystemInfo` |
+| 6 | CTRL+C signal handling | `SetConsoleCtrlHandler` |
+| 7 | Environment variables | `getenv`, `_putenv_s` |
+| 8 | System utilities (time, date) | `GetLocalTime` |
+| 9 | Help system + .bat execution | `std::ifstream`, `execute_command` |
 
 ## Reference
 

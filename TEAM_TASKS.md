@@ -7,19 +7,19 @@ Based on a team of 4 members, the MyShell project has been divided into 4 distin
 ---
 
 ## 💻 Role 1: The Core Architect (Perfect for Mac User 🍏)
-**Focus:** The Engine, Input Parsing, and User Experience.
-This role builds the brain of the shell. You will handle the REPL loop, make sure the shell understands complex commands, and build the history/help systems. Since this relies entirely on Standard C++ string manipulation and data structures, it can be developed and tested fully on macOS.
+**Focus:** The Engine, Input Parsing, and Command History.
+This role builds the brain of the shell. You will handle the REPL loop, make sure the shell understands complex commands, and build the history system. Since this relies entirely on Standard C++ string manipulation and data structures, it can be developed and tested fully on macOS.
 
 **Assigned Files:**
 - `main.cpp` (REPL loop, tokenizer, command dispatcher)
 - `Feature/history.h` (Save and load command history)
-- `Feature/help.h` (Print help instructions)
 
 **Key Tasks:**
 - Write the `while(true)` REPL loop.
 - Upgrade the tokenizer to handle quotation marks (e.g., `write_file "hello world" out.txt`).
 - Implement the `history` command (read/write to `history.txt`).
-- Implement the `help` system to list all commands.
+- Implement the `exit` command to quit the shell.
+- Build the command dispatcher (`execute_command`) that routes commands to the correct feature function.
 
 **Libraries:** `<iostream>`, `<string>`, `<vector>`, `<fstream>`, `<sstream>`
 
@@ -54,28 +54,35 @@ This role is the most critical for an Operating Systems class. You will write co
 
 **Key Tasks:**
 - Implement `start_foreground` (create process and wait) and `start_background` (create process without waiting).
-- Implement `terminate <PID>` to kill running processes.
+- Implement `terminate <PID>` to kill running background processes.
 - Use Toolhelp32 to snapshot and list all running processes (`list_processes`).
+- **Track the shell's own background processes** with status (PID, Cmd name, Running/Suspended/Terminated) using an internal tracking table (`list` command).
 - Implement `suspend` and `resume` to pause and unpause programs.
+- **Handle CTRL+C signal** using `SetConsoleCtrlHandler()` to kill only the running foreground child process without terminating the shell itself.
 
 **Libraries:** `<windows.h>`, `<tlhelp32.h>`
 
 ---
 
-## 🛠️ Role 4: System & Environment Administrator
-**Focus:** OS Configuration and Hardware Information.
-This role bridges the gap between the shell and the underlying hardware/OS state. You will manage environment variables (like `PATH`) and query the OS for hardware statistics (RAM, CPU, Disk, Time).
+## 🛠️ Role 4: System & Shell Utilities
+**Focus:** System Info, Environment Variables, Help System, Batch Execution, and Testing.
+This role provides the supporting utilities that make the shell complete. You will manage environment variables (like `PATH`), query the OS for time/date, document all commands, and enable batch script execution.
 
 **Assigned Files:**
 - `Feature/environment.h`
 - `Feature/system_utils.h`
+- `Feature/help.h`
+- `Testcase/test_basic.bat`
 
 **Key Tasks:**
-- Implement `set_env`, `unset_env`, and `print_env` using `std::map` and Windows environment functions (`_putenv_s`).
-- Implement commands to query time/date (`GetLocalTime`).
-- Implement hardware queries: CPU info (`GetSystemInfo`), Memory (`GlobalMemoryStatusEx`), and Disk space (`GetDiskFreeSpaceExA`).
+- Implement `path` and `addpath` using `getenv` and `_putenv_s` to view/modify the PATH environment variable.
+- Implement `set_env`, `unset_env`, and `print_env` using `std::map` and Windows environment functions.
+- Implement commands to query `time` and `date` (`GetLocalTime`).
+- Implement the `help` system to list and describe ALL shell commands (coordinate with other roles for command names).
+- **Implement `.bat` file execution**: read a `.bat` file line-by-line and feed each line into the shell's `execute_command()` function. Agree with Role 1 on the function signature.
+- **Write test scripts** in `Testcase/test_basic.bat` to demonstrate and test shell features.
 
-**Libraries:** `<windows.h>`, `<cstdlib>`, `<map>`
+**Libraries:** `<windows.h>`, `<cstdlib>`, `<map>`, `<fstream>`, `<iostream>`
 
 ---
 
@@ -83,3 +90,10 @@ This role bridges the gap between the shell and the underlying hardware/OS state
 1. **The Mac User (Role 1)** can compile `main.cpp` with `g++ -std=c++17 main.cpp` on their MacBook and test the tokenizer, history, and help commands. They can comment out the `#include` lines for Windows-specific features temporarily if needed to test locally.
 2. Roles 2, 3, and 4 will write their `.h` files on Windows.
 3. Once Role 1 finishes the dispatcher in `main.cpp`, all the feature files from Roles 2, 3, and 4 can be seamlessly plugged in.
+4. **Role 4** needs to agree with **Role 1** on the `execute_command()` function signature for `.bat` file execution. All other roles can work **fully in parallel**.
+
+## 📋 Interface Agreement
+Role 1 must expose the following function that Role 4 will call for `.bat` execution:
+```cpp
+void execute_command(const string& command, const vector<string>& args);
+```

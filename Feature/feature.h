@@ -9,20 +9,20 @@
 // Add new #include lines here as you create new feature files.
 // ============================================================================
 
-// --- File & Directory Management ---
+// --- File & Directory Management (Role 2) ---
 #include "file.h"           // File operations (partially implemented ✅)
 #include "directory.h"      // Directory operations (empty stub)
 #include "navigation.h"     // cd, pwd, dir (empty stub)
 
-// --- Process Management (Most important for OS course!) ---
-#include "process.h"        // Process create/kill/list/suspend/resume (empty stub)
+// --- Process Management (Role 3 — Most important for OS course!) ---
+#include "process.h"        // Process create/kill/list/suspend/resume + CTRL+C handler
 
-// --- Environment & Variables ---
-#include "environment.h"    // Environment variables (empty stub)
+// --- Environment Variables (Role 4) ---
+#include "environment.h"    // Environment variables: path, addpath, set_env
 
-// --- System Utilities ---
-#include "system_utils.h"   // time, date, cpuinfo, meminfo (empty stub)
+// --- System & Shell Utilities (Role 4) ---
+#include "system_utils.h"   // time, date, .bat file execution
+#include "help.h"           // Help system — documents all commands
 
-// --- Shell Utilities ---
-#include "history.h"        // Command history (empty stub)
-#include "help.h"           // Help system (empty stub)
+// --- Command History (Role 1) ---
+#include "history.h"        // Command history
