@@ -17,7 +17,7 @@ namespace fs = std::filesystem;
 class FileManager {
 public:
     FileManager(){};
-    
+    static const unordered_set<string> supportedCommands;
     static const unordered_set<string>& getSupportedCommands(){
         return supportedCommands;
     };
@@ -215,15 +215,54 @@ public:
             }
         }
     }
+    void moveFile(const vector<string>& args){
+    if (args.size() != 2){
+        cerr << "Usage: move_file <source_path> <destination_path>" << endl;
+        return;
+    }
 
+    fs::path sourcePath = args[0];
+    fs::path destinationPath = args[1];
+
+    if (!fs::exists(sourcePath)){
+        cerr << "Source file does not exist: " << sourcePath << endl;
+        return;
+    }
+
+    // SỬA : Nếu đích là thư mục, tự động nối thêm tên file vào sau thư mục đó
+    if (fs::is_directory(destinationPath)) {
+        destinationPath = destinationPath / sourcePath.filename();
+    }
+
+    try {
+        // Thử cách nhanh nhất (cùng ổ đĩa)
+        fs::rename(sourcePath, destinationPath);
+        cout << "File moved from " << sourcePath << " to " << destinationPath << endl;
+    } 
+    catch (const fs::filesystem_error& e) {
+        // SỬA : Xử lý khi di chuyển khác ổ đĩa (ví dụ từ C: sang D:)
+        try {
+            // Copy file sang nơi mới (ghi đè nếu đã tồn tại)
+            fs::copy_file(sourcePath, destinationPath, fs::copy_options::overwrite_existing);
+            // Xóa file ở nơi cũ
+            fs::remove(sourcePath);
+            
+            cout << "File moved (cross-drive) from " << sourcePath << " to " << destinationPath << endl;
+        } 
+        catch (const exception& ex) {
+            cerr << "Failed to move file cross-drive: " << ex.what() << endl;
+        }
+    }
+}
 private:
-    inline static const unordered_set<string> supportedCommands = {
-        "writeFile",
-        "readFile",
-        "sizeFile",
+    
+};
+const unordered_set<string> FileManager::supportedCommands= {
+        "write_file",
+        "read_file",
+        "size_file",
+        "move_file",
         "open",
         "rename"
     };
-};
-
 #endif // FILE_H
