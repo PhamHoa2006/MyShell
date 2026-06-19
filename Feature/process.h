@@ -17,19 +17,6 @@
 //   Use SetConsoleCtrlHandler() to catch Ctrl+C and kill only the running
 //   foreground child process, without terminating the shell itself.
 //
-// Libraries needed:
-//   #include <windows.h>     — CreateProcess, TerminateProcess, etc.
-//   #include <tlhelp32.h>    — Toolhelp API for process/thread enumeration
-//   #include <vector>
-//   #include <string>
-//   #include <iostream>
-//
-// Key Windows structures:
-//   STARTUPINFOA si          — Initialize with: si.cb = sizeof(si)
-//   PROCESS_INFORMATION pi   — Output: pi.hProcess, pi.hThread, pi.dwProcessId
-//   PROCESSENTRY32 pe        — Initialize with: pe.dwSize = sizeof(pe)
-//   THREADENTRY32 te         — Initialize with: te.dwSize = sizeof(te)
-//
 // Reference: ../Operating-System-Projects/Feature/process.h
 // ============================================================================
 
@@ -41,160 +28,316 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <set>
-
-// Status enum for tracking the shell's own background processes
-enum class ProcessStatus
-{
-    RUNNING,
-    SUSPENDED,
-    TERMINATED
-};
+#include <algorithm>
 
 // Info struct for tracking background processes launched by this shell
-struct BackgroundProcessInfo
-{
+struct ProcessInfo {
     DWORD pid;
-    std::string cmdName;
-    HANDLE hProcess;
-    HANDLE hThread;
-    ProcessStatus status;
+    std::string name;
+    std::string status;
 };
 
 // Global handle to the current foreground child process (used by CTRL+C handler)
-// Set before WaitForSingleObject, reset to NULL after foreground process finishes.
 inline HANDLE g_hForegroundProcess = NULL;
 
 // --- CTRL+C Handler ---
-// Register this with SetConsoleCtrlHandler() at shell startup.
-// When Ctrl+C is pressed:
-//   - If a foreground process is running → terminate it, return TRUE (shell survives)
-//   - If no foreground process → return TRUE (ignore, shell survives)
-inline BOOL WINAPI CtrlHandler(DWORD dwCtrlType)
-{
-    if (dwCtrlType == CTRL_C_EVENT)
-    {
-        if (g_hForegroundProcess != NULL)
-        {
-            // TODO: TerminateProcess(g_hForegroundProcess, 1);
-            // TODO: Print message like "[Ctrl+C] Foreground process terminated."
+inline BOOL WINAPI CtrlHandler(DWORD fdwCtrlType) {
+    if (fdwCtrlType == CTRL_C_EVENT) {
+        if (g_hForegroundProcess != NULL) {
+            std::cout << "\n[Ctrl+C] Foreground process interrupted. Terminating it..." << std::endl;
+            TerminateProcess(g_hForegroundProcess, 0);
+            g_hForegroundProcess = NULL;
+        } else {
+            std::cout << "\n[Ctrl+C] Ignored. No foreground process running." << std::endl;
         }
-        return TRUE; // Shell does NOT exit
+        return TRUE; // Tell Windows we handled it; do NOT kill the shell.
     }
-    return FALSE;
+    return FALSE; // Let default behavior handle other signals
+}
+
+// Compare function for sorting processes by name
+inline bool compareProcessName(const std::pair<DWORD, std::string>& a, const std::pair<DWORD, std::string>& b) {
+    return a.second < b.second;
 }
 
 class ProcessManager
 {
 public:
-    // --- start_foreground <exe> ---
-    // Create a new process and WAIT for it to finish before returning to shell
-    // APIs: CreateProcessA() + WaitForSingleObject(pi.hProcess, INFINITE)
-    // IMPORTANT: Set g_hForegroundProcess = pi.hProcess BEFORE calling
-    //            WaitForSingleObject, and reset it to NULL after.
     void startProcessForeground(const std::vector<std::string>& args)
     {
-        // TODO: Implement this function
-        // Steps:
-        // 1. Check args is not empty
-        // 2. Build command string from args
-        // 3. Initialize STARTUPINFOA and PROCESS_INFORMATION
-        // 4. Call CreateProcessA(...)
-        // 5. If success:
-        //    a. g_hForegroundProcess = pi.hProcess;   // Enable CTRL+C kill
-        //    b. WaitForSingleObject(pi.hProcess, INFINITE);
-        //    c. g_hForegroundProcess = NULL;           // Disable CTRL+C kill
-        // 6. CloseHandle(pi.hProcess) and CloseHandle(pi.hThread)
-        // 7. If fail: print error with GetLastError()
+        if (args.empty()) {
+            std::cout << "Usage: start_foreground <executable_path>" << std::endl;
+            return;
+        }
+        
+        std::string pathStr = joinArgs(args);
+        
+        // We need a modifiable copy for CreateProcess
+        char* path = new char[pathStr.length() + 1];
+        strcpy(path, pathStr.c_str());
+
+        STARTUPINFOA si = {0};
+        PROCESS_INFORMATION pi = {0};
+        si.cb = sizeof(si);
+
+        std::cout << "Initializing new process (Foreground)..." << std::endl;
+
+        if (CreateProcessA(
+            nullptr, path, nullptr, nullptr, FALSE,
+            CREATE_NEW_CONSOLE, nullptr, nullptr, &si, &pi
+        )) {
+            std::cout << "New process is running, shell stops ..." << std::endl;
+            
+            // Register the running foreground process
+            g_hForegroundProcess = pi.hProcess;
+
+            // FOREGROUND: Use WaitForSingleObject to freeze shell indefinitely.
+            WaitForSingleObject(pi.hProcess, INFINITE);
+            
+            // Unregister since it finished
+            g_hForegroundProcess = NULL;
+
+            std::cout << "New process was terminated, Shell is now working back!" << std::endl;
+
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
+        } else {
+            std::cout << "Error! Can't open process! Error code: " << GetLastError() << std::endl;
+        }
+        delete[] path;
     }
 
-    // --- start_background <exe> ---
-    // Create a new process and return to shell IMMEDIATELY
-    // APIs: CreateProcessA() with CREATE_NEW_PROCESS_GROUP flag
     void startProcessBackground(const std::vector<std::string>& args)
     {
-        // TODO: Implement this function
-        // Same as foreground but:
-        // - Use CREATE_NEW_PROCESS_GROUP as dwCreationFlags
-        // - Do NOT call WaitForSingleObject
-        // - Store process info in backgroundProcesses vector for tracking
-        // - Set status = ProcessStatus::RUNNING
+        if (args.empty()) {
+            std::cout << "Usage: start_background <executable_path>" << std::endl;
+            return;
+        }
+        
+        std::string pathStr = joinArgs(args);
+        
+        char* path = new char[pathStr.length() + 1];
+        strcpy(path, pathStr.c_str());
+
+        STARTUPINFOA si = {0};
+        PROCESS_INFORMATION pi = {0};
+        si.cb = sizeof(si);
+
+        std::cout << "Initializing new process (Background)..." << std::endl;
+
+        if (CreateProcessA(
+            nullptr, path, nullptr, nullptr, FALSE,
+            CREATE_NEW_CONSOLE, nullptr, nullptr,
+            &si, &pi
+        )) {
+            std::cout << "Successfully, new process is running in background! PID: " << pi.dwProcessId << std::endl;
+            
+            // Save to tracking table
+            ProcessInfo info;
+            info.pid = pi.dwProcessId;
+            info.name = pathStr;
+            info.status = "Running";
+            myBackgroundProcesses.push_back(info);
+            
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
+        } else {
+            std::cout << "Error! Can't open process! Error code: " << GetLastError() << std::endl;
+        }
+        delete[] path;
     }
 
-    // --- terminate <PID> ---
-    // Kill a process by its PID
-    // APIs: OpenProcess() + TerminateProcess() + CloseHandle()
     void terminateProcess(const std::vector<std::string>& args)
     {
-        // TODO: Implement this function
-        // Steps:
-        // 1. Parse PID from args[0] using std::stoul()
-        // 2. OpenProcess(PROCESS_TERMINATE, FALSE, pid)
-        // 3. TerminateProcess(handle, 0)
-        // 4. CloseHandle(handle)
-        // 5. Update status in backgroundProcesses to TERMINATED
+        if (args.empty()) {
+            std::cout << "Usage: terminate <PID>" << std::endl;
+            return;
+        }
+        
+        DWORD targetPID = std::stoul(args[0]);
+        std::cout << "Trying to terminate " << targetPID << " ..." << std::endl;
+
+        HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, targetPID);
+
+        if (hProcess == nullptr){
+            std::cout << "Fail to open process PID " << targetPID << "\nError code: " << GetLastError() << std::endl;
+        } else {
+            // Successfully opened target process => terminate immediately
+            if (TerminateProcess(hProcess, 0)){
+                std::cout << "Successfully terminated PID " << targetPID << std::endl;
+
+                // Update status in tracking table
+                for (auto& process : myBackgroundProcesses) {
+                    if (process.pid == targetPID) {
+                        process.status = "Terminated";
+                        break;
+                    }
+                }
+            } else {
+                std::cout << "Fail to terminate PID " << targetPID << "\nError code: " << GetLastError() << std::endl;
+            }
+            CloseHandle(hProcess);
+        }
     }
 
-    // --- list_processes ---
-    // List all running processes on the system (bonus, not required by course)
-    // APIs: CreateToolhelp32Snapshot() + Process32First/Next()
     void listProcesses(const std::vector<std::string>& args)
     {
-        // TODO: Implement this function
-        // Steps:
-        // 1. CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
-        // 2. Initialize PROCESSENTRY32, set dwSize
-        // 3. Process32First(snapshot, &pe)
-        // 4. Loop with Process32Next, print pe.szExeFile and pe.th32ProcessID
-        // 5. CloseHandle(snapshot)
+        std::cout << "Trying to snapshot all existing processes ..." << std::endl;
+        
+        HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+        if (hProcessSnap == nullptr || hProcessSnap == INVALID_HANDLE_VALUE){
+            std::cout << "E02: Can't snapshot processes!" << std::endl;
+            return;
+        }
+
+        PROCESSENTRY32 pe32;
+        pe32.dwSize = sizeof(PROCESSENTRY32);
+        std::vector<std::pair<DWORD, std::string>> processList;
+
+        if (Process32First(hProcessSnap, &pe32)){
+            do{
+                processList.push_back(std::make_pair(pe32.th32ProcessID, pe32.szExeFile));
+            } while (Process32Next(hProcessSnap, &pe32));
+        } else {
+            std::cout << "E03: Can't read the first process!" << std::endl;
+        }
+
+        CloseHandle(hProcessSnap);
+        std::sort(processList.begin(), processList.end(), compareProcessName);
+        
+        std::cout << "--- All Processes ---" << std::endl;
+        for (const auto& process : processList){
+            std::cout << process.first << "\t- Name: " << process.second << std::endl;
+        }
+        std::cout << "Finish get list of All Process. Size: " << processList.size() << std::endl;
     }
 
-    // --- list ---
-    // List the shell's own background processes with status
-    // This is the REQUIRED command from the course requirements.
-    // Output format: PID | Cmd Name | Status (Running/Suspended/Terminated)
     void listBackgroundProcesses(const std::vector<std::string>& args)
     {
-        // TODO: Implement this function
-        // Steps:
-        // 1. Print table header: PID | Command | Status
-        // 2. Loop through backgroundProcesses vector
-        // 3. For each process, check if it's still alive (WaitForSingleObject with 0 timeout)
-        //    - If WAIT_OBJECT_0: process has exited → update status to TERMINATED
-        // 4. Print each entry with its current status
+        std::cout << "\n--- Shell Background Processes ---" << std::endl;
+        if (myBackgroundProcesses.empty()) {
+            std::cout << "No background processes running." << std::endl;
+        } else {
+            for (const auto& process : myBackgroundProcesses) {
+                std::cout << "PID: " << process.pid 
+                     << "\t| Status: " << process.status 
+                     << "\t| Name: " << process.name << std::endl;
+            }
+        }
+        std::cout << "----------------------------------\n" << std::endl;
     }
 
-    // --- suspend <PID> ---
-    // Suspend ALL threads of a process (pauses the process)
-    // APIs: CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD) + Thread32First/Next
-    //       + OpenThread() + SuspendThread()
     void suspendProcess(const std::vector<std::string>& args)
     {
-        // TODO: Implement this function
-        // Steps:
-        // 1. Parse PID from args
-        // 2. Snapshot all threads: CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0)
-        // 3. Iterate with Thread32First/Next
-        // 4. For each thread where th32OwnerProcessID == target PID:
-        //    a. OpenThread(THREAD_SUSPEND_RESUME, FALSE, threadID)
-        //    b. SuspendThread(handle)
-        //    c. CloseHandle(handle)
-        // 5. Update status in backgroundProcesses to SUSPENDED
+        if (args.empty()) {
+            std::cout << "Usage: suspend <PID>" << std::endl;
+            return;
+        }
+        
+        DWORD targetPID = std::stoul(args[0]);
+        std::cout << "Trying to freeze: " << targetPID << "..." << std::endl;
+        
+        HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+        if (hThreadSnap == nullptr || hThreadSnap == INVALID_HANDLE_VALUE){
+            std::cout << "E01: Can't snapshot threads!" << std::endl;
+            return;
+        }
+
+        THREADENTRY32 te32;
+        te32.dwSize = sizeof(THREADENTRY32);
+        int frozenCount = 0;
+
+        if (Thread32First(hThreadSnap, &te32)){
+            do{
+                if (te32.th32OwnerProcessID == targetPID){
+                    HANDLE hThread = OpenThread(THREAD_SUSPEND_RESUME, FALSE, te32.th32ThreadID);
+                    if (hThread != nullptr){
+                        SuspendThread(hThread);
+                        CloseHandle(hThread);
+                        frozenCount++;
+                        std::cout << "Freezed thread: " << te32.th32ThreadID << std::endl;   
+                    }
+                }
+            } while (Thread32Next(hThreadSnap, &te32));
+        }
+
+        CloseHandle(hThreadSnap);
+
+        std::cout << "Finished freezing PID " << targetPID << "\nTotal threads frozen: " << frozenCount << std::endl;
+
+        // Update status in tracking table
+        for (auto& process : myBackgroundProcesses) {
+            if (process.pid == targetPID) {
+                process.status = "Suspended";
+                break;
+            }
+        }
     }
 
-    // --- resume <PID> ---
-    // Resume ALL threads of a suspended process
-    // Same as suspend but call ResumeThread() instead of SuspendThread()
     void resumeProcess(const std::vector<std::string>& args)
     {
-        // TODO: Implement this function
-        // Same pattern as suspendProcess but use ResumeThread()
-        // Update status in backgroundProcesses to RUNNING
+        if (args.empty()) {
+            std::cout << "Usage: resume <PID>" << std::endl;
+            return;
+        }
+        
+        DWORD targetPID = std::stoul(args[0]);
+        std::cout << "Trying to resume " << targetPID << " ..." << std::endl;
+
+        // Snapshot of all threads
+        HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+        if (hThreadSnap == nullptr || hThreadSnap == INVALID_HANDLE_VALUE){
+            std::cout << "E04: Can't snapshot threads!" << std::endl;
+            return;
+        }
+
+        THREADENTRY32 te32;
+        te32.dwSize = sizeof(THREADENTRY32);
+        int resumedCount = 0;
+
+        // Loop through every threads, and resume all that fit targetPID
+        if (Thread32First(hThreadSnap, &te32)){
+            do{
+                if (te32.th32OwnerProcessID == targetPID){
+                    HANDLE hThread = OpenThread(THREAD_SUSPEND_RESUME, FALSE, te32.th32ThreadID);
+                    if (hThread != nullptr){
+                        DWORD prevCount;
+                        do{
+                            prevCount = ResumeThread(hThread);
+                        } while (prevCount > 1);
+
+                        CloseHandle(hThread);
+                        resumedCount++;
+                        std::cout << "Activated thread: " << te32.th32ThreadID << std::endl;
+                    }
+                }
+            } while (Thread32Next(hThreadSnap, &te32));
+        }
+
+        CloseHandle(hThreadSnap);
+        std::cout << "Finished resuming PID " << targetPID << "\nTotal threads resumed: " << resumedCount << std::endl;
+
+        // Update status in tracking table
+        for (auto& process : myBackgroundProcesses) {
+            if (process.pid == targetPID) {
+                process.status = "Running";
+                break;
+            }
+        }
     }
 
 private:
-    // Track background processes launched by this shell (PID, name, handle, status)
-    std::vector<BackgroundProcessInfo> backgroundProcesses;
+    // Helper function to combine arguments into a single command line string
+    std::string joinArgs(const std::vector<std::string>& args) {
+        if (args.empty()) return "";
+        std::string result = args[0];
+        for (size_t i = 1; i < args.size(); ++i) {
+            result += " " + args[i];
+        }
+        return result;
+    }
+
+    std::vector<ProcessInfo> myBackgroundProcesses;
 };
 
 #endif // PROCESS_H

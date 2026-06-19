@@ -14,12 +14,12 @@
 // ============================================================================
 
 // TODO: Implement this
-// #include <windows.h>
-// #include <iostream>
-//
-// int main() {
-//     std::cout << "Child process started! PID: " << GetCurrentProcessId() << std::endl;
-//     Sleep(10000);  // Sleep 10 seconds
-//     std::cout << "Child process finished!" << std::endl;
-//     return 0;
-// }
+#include <windows.h>
+#include <iostream>
+
+int main() {
+    std::cout << "Child process started! PID: " << GetCurrentProcessId() << std::endl;
+    Sleep(10000);  // Sleep 10 seconds
+    std::cout << "Child process finished!" << std::endl;
+    return 0;
+}
