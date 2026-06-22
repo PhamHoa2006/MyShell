@@ -35,17 +35,30 @@
 #include <fstream>
 #include <sstream>
 
+extern void execute_command(const std::string& command, const std::vector<std::string>& args);
+
 class SystemUtils
 {
 public:
     void showSystemTime(const std::vector<std::string>& args)
     {
-        // TODO: Use GetLocalTime() or std::time/localtime
+        SYSTEMTIME st;
+        GetLocalTime(&st); 
+        std::cout << "Current Time: " 
+                  << (st.wHour < 10 ? "0" : "") << st.wHour << ":"
+                  << (st.wMinute < 10 ? "0" : "") << st.wMinute << ":"
+                  << (st.wSecond < 10 ? "0" : "") << st.wSecond << std::endl;
     }
 
     void showSystemDate(const std::vector<std::string>& args)
     {
-        // TODO: Use GetLocalTime()
+        SYSTEMTIME st;
+        GetLocalTime(&st); 
+        
+        std::cout << "Current Date: " 
+                  << (st.wDay < 10 ? "0" : "") << st.wDay << "/"
+                  << (st.wMonth < 10 ? "0" : "") << st.wMonth << "/"
+                  << st.wYear << std::endl;
     }
 
     // --- run <file.bat> ---
@@ -70,6 +83,45 @@ public:
         // 2. Open file, read line-by-line
         // 3. Skip empty/comment lines
         // 4. Tokenize and dispatch each line
+        if (args.empty()) {
+            std::cerr << "Usage: run <filename.bat>" << std::endl;
+            return;
+        }
+        std::string filename = args[0];
+        std::ifstream file(filename);
+        if (!file.is_open()) {
+            std::cerr << "Error: Cannot open file " << filename << std::endl;
+            return;
+        }
+        std::cout << "Executing batch file: " << filename << "...\n" << std::endl;
+        std::string line;
+        while(std::getline(file, line)){
+            if (line.empty()) continue;
+
+            if (line.rfind("::", 0) == 0 || line.rfind("REM", 0) == 0) {
+                continue; 
+            }
+
+            std::stringstream ss(line);
+            std::string cmd;
+            ss >> cmd; 
+
+            if (cmd.empty()) continue;
+
+            std::vector<std::string> batchArgs;
+            std::string arg;
+            while (ss >> arg) {
+                batchArgs.push_back(arg);
+            }
+
+            std::cout << "=> Running: " << line << std::endl;
+
+            execute_command(cmd, batchArgs);
+            std::cout << "--------------------------------------" << std::endl;
+
+            file.close();
+            std::cout << "Batch file execution finished." << std::endl;
+        }
     }
 };
 
