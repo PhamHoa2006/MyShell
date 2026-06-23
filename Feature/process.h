@@ -35,6 +35,7 @@ struct ProcessInfo {
     DWORD pid;
     std::string name;
     std::string status;
+    HANDLE hProcess;
 };
 
 // Global handle to the current foreground child process (used by CTRL+C handler)
@@ -137,10 +138,10 @@ public:
             info.pid = pi.dwProcessId;
             info.name = pathStr;
             info.status = "Running";
+            info.hProcess = pi.hProcess; // KEEP the handle to track status
             myBackgroundProcesses.push_back(info);
             
-            CloseHandle(pi.hProcess);
-            CloseHandle(pi.hThread);
+            CloseHandle(pi.hThread); // Only close thread handle
         } else {
             std::cout << "Error! Can't open process! Error code: " << GetLastError() << std::endl;
         }
@@ -218,7 +219,19 @@ public:
         if (myBackgroundProcesses.empty()) {
             std::cout << "No background processes running." << std::endl;
         } else {
-            for (const auto& process : myBackgroundProcesses) {
+            for (auto& process : myBackgroundProcesses) {
+                // If it's not already marked terminated, check if the user closed it manually
+                if (process.status != "Terminated" && process.hProcess != NULL) {
+                    DWORD exitCode = 0;
+                    if (GetExitCodeProcess(process.hProcess, &exitCode)) {
+                        if (exitCode != STILL_ACTIVE) {
+                            process.status = "Terminated";
+                            CloseHandle(process.hProcess);
+                            process.hProcess = NULL;
+                        }
+                    }
+                }
+
                 std::cout << "PID: " << process.pid 
                      << "\t| Status: " << process.status 
                      << "\t| Name: " << process.name << std::endl;

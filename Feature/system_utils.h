@@ -35,17 +35,30 @@
 #include <fstream>
 #include <sstream>
 
+extern void execute_command(const std::string& command, const std::vector<std::string>& args);
+
 class SystemUtils
 {
 public:
     void showSystemTime(const std::vector<std::string>& args)
     {
-        // TODO: Use GetLocalTime() or std::time/localtime
+        SYSTEMTIME st;
+        GetLocalTime(&st); 
+        std::cout << "Current Time: " 
+                  << (st.wHour < 10 ? "0" : "") << st.wHour << ":"
+                  << (st.wMinute < 10 ? "0" : "") << st.wMinute << ":"
+                  << (st.wSecond < 10 ? "0" : "") << st.wSecond << std::endl;
     }
 
     void showSystemDate(const std::vector<std::string>& args)
     {
-        // TODO: Use GetLocalTime()
+        SYSTEMTIME st;
+        GetLocalTime(&st); 
+        
+        std::cout << "Current Date: " 
+                  << (st.wDay < 10 ? "0" : "") << st.wDay << "/"
+                  << (st.wMonth < 10 ? "0" : "") << st.wMonth << "/"
+                  << st.wYear << std::endl;
     }
 
     // --- run <file.bat> ---
@@ -63,13 +76,74 @@ public:
     // 3. Skip empty lines and comment lines (starting with "::" or "REM")
     // 4. Tokenize the line into command + args
     // 5. Call executor(command, args)
+    // --- Lệnh run <file.bat> bản Bất tử (Chấp mọi loại định dạng Mac/Linux/Win) ---
     void runBatFile(const std::vector<std::string>& args)
     {
-        // TODO: Implement this function
-        // 1. Check args is not empty (args[0] should be the filename)
-        // 2. Open file, read line-by-line
-        // 3. Skip empty/comment lines
-        // 4. Tokenize and dispatch each line
+        if (args.empty()) {
+            std::cerr << "Usage: run <filename.bat>" << std::endl;
+            return;
+        }
+
+        std::string filename = args[0];
+        // 1. Mở file ở chế độ BINARY thô để Windows không tự ý làm méo ký tự
+        std::ifstream file(filename, std::ios::binary); 
+
+        if (!file.is_open()) {
+            std::cerr << "Error: Cannot open file " << filename << std::endl;
+            return;
+        }
+
+        std::cout << "Executing batch file: " << filename << "...\n" << std::endl;
+
+        // 2. Hút trọn vẹn raw bytes của file vào RAM
+        std::string raw_content;
+        char c;
+        while (file.get(c)) {
+            raw_content += c;
+        }
+        file.close();
+
+        // 3. THUẬT TOÁN SAN BẰNG: Biến \r\n (Win) và \r (Mac) thành chuẩn \n của C++
+        std::string normalized_content;
+        for (size_t i = 0; i < raw_content.size(); ++i) {
+            if (raw_content[i] == '\r') {
+                normalized_content += '\n';
+                if (i + 1 < raw_content.size() && raw_content[i + 1] == '\n') {
+                    i++; // Bỏ qua ký tự \n đi kèm của Windows
+                }
+            } else {
+                normalized_content += raw_content[i];
+            }
+        }
+
+        // 4. Đọc từng dòng mượt mà từ chuỗi đã chuẩn hóa
+        std::stringstream ss_file(normalized_content);
+        std::string line;
+
+        while (std::getline(ss_file, line)) {
+            if (line.empty()) continue;
+
+            // Bỏ qua comment
+            if (line.rfind("::", 0) == 0 || line.rfind("REM", 0) == 0) continue;
+
+            std::stringstream ss_line(line);
+            std::string cmd;
+            ss_line >> cmd;
+
+            if (cmd.empty()) continue;
+
+            std::vector<std::string> batchArgs;
+            std::string arg;
+            while (ss_line >> arg) {
+                batchArgs.push_back(arg);
+            }
+
+            std::cout << "=> Running: " << line << std::endl;
+            execute_command(cmd, batchArgs);
+            std::cout << "--------------------------------------" << std::endl;
+        }
+
+        std::cout << "Batch file execution finished." << std::endl;
     }
 };
 
