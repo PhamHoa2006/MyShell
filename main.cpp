@@ -2,9 +2,11 @@
 // main.cpp — Master Engine (Hợp nhất code nhánh Sơn + Role 4 + Role 1)
 // ============================================================================
 
+#include <csignal>
+#include <filesystem>
 #include <iostream>
+#include <sstream>
 #include <string>
-#include <windows.h>
 #include <vector>
 #include <sstream>
 
@@ -24,7 +26,10 @@
 #include "Feature/environment.h"
 #include "Feature/system_utils.h"
 
-using namespace std;    
+using namespace std;
+namespace fs = std::filesystem;
+
+CommandHistory cmdHistory;
 
 // Khởi tạo toàn bộ các Manager toàn cục
 ProcessManager pm;

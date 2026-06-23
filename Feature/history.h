@@ -32,31 +32,51 @@ public:
     // Add a command to history (call this every time user enters a command)
     void add(const string& command)
     {
-        // TODO: Implement
         // 1. Push command to history vector
+        history.push_back(command);
         // 2. Append command to history file
+        ofstream outFile(historyFile, ios::app);
+        if (outFile.is_open()) {
+            outFile << command << "\n";
+            outFile.close();
+        }
     }
 
     // Show all commands in history
     void show() const
     {
-        // TODO: Implement
         // Loop through history vector, print with index numbers
+        for (size_t i = 0; i < history.size(); ++i) {
+            cout << (i + 1) << "  " << history[i] << endl;
+        }
     }
 
     // Load history from file (call once at shell startup)
     void load()
     {
-        // TODO: Implement
-        // Read history.txt line by line into history vector
+        history.clear();
+        ifstream inFile(historyFile);
+        if (inFile.is_open()) {
+            string line;
+            while (getline(inFile, line)) {
+                if (!line.empty()) {
+                    history.push_back(line);
+                }
+            }
+            inFile.close();
+        }
     }
 
     // Clear all history
     void clear()
     {
-        // TODO: Implement
         // 1. Clear the vector
+        history.clear();
         // 2. Truncate the file (open with ofstream::trunc)
+        ofstream outFile(historyFile, ios::trunc);
+        if (outFile.is_open()) {
+            outFile.close();
+        }
     }
 
 private:

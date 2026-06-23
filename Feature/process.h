@@ -339,6 +339,24 @@ public:
         }
     }
 
+    void killAllBackgroundProcesses()
+    {
+        std::cout << "Sending kill signal to all child background processes..." << std::endl;
+        int killedCount = 0;
+        for (auto& process : myBackgroundProcesses) {
+            if (process.status != "Terminated") {
+                HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, process.pid);
+                if (hProcess != nullptr) {
+                    if (TerminateProcess(hProcess, 0)) {
+                        process.status = "Terminated";
+                        killedCount++;
+                    }
+                    CloseHandle(hProcess);
+                }
+            }
+        }
+    }
+
 private:
     // Helper function to combine arguments into a single command line string
     std::string joinArgs(const std::vector<std::string>& args) {
