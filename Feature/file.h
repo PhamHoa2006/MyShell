@@ -145,7 +145,9 @@ public:
                     cerr << "Cu phap sai. Usage: write_file <content> <filename> LINE N" << endl;
                     return;
                 }
-                int lineNumber = stoi(args[3]);
+                int lineNumber;
+                try { lineNumber = stoi(args[3]); } 
+                catch (...) { cerr << "Error: Line number must be an integer." << endl; return; }
                 if (lineNumber < 1 || lineNumber > (int)lines.size() + 1){
                     cerr << "Line number out of range. Must be between 1 and " << lines.size() + 1 << endl;
                     return;
@@ -190,35 +192,39 @@ public:
         }
         else if (args.size() >= 3) {
             string option = args[1];
-            if (option == "HEAD") {
-                int numLines = stoi(args[2]);
-                for (int i = 0; i < min(numLines, (int)lines.size()); ++i){
-                    cout << lines[i] << endl;
+            try {
+                if (option == "HEAD") {
+                    int numLines = stoi(args[2]);
+                    for (int i = 0; i < min(numLines, (int)lines.size()); ++i){
+                        cout << lines[i] << endl;
+                    }
                 }
-            }
-            else if (option == "FOOT") {
-                int numLines = stoi(args[2]);
-                int start = max(0, (int)lines.size() - numLines);
-                for (size_t i = start; i < lines.size(); ++i){
-                    cout << lines[i] << endl;
+                else if (option == "FOOT") {
+                    int numLines = stoi(args[2]);
+                    int start = max(0, (int)lines.size() - numLines);
+                    for (size_t i = start; i < lines.size(); ++i){
+                        cout << lines[i] << endl;
+                    }
                 }
-            }
-            else if (option == "LINE") {
-                int lineNum = stoi(args[2]);
-                if (lineNum >= 1 && lineNum <= (int)lines.size()) {
-                    cout << lines[lineNum - 1] << endl;
-                } else {
-                    cerr << "Line number out of range." << endl;
+                else if (option == "LINE") {
+                    int lineNum = stoi(args[2]);
+                    if (lineNum >= 1 && lineNum <= (int)lines.size()) {
+                        cout << lines[lineNum - 1] << endl;
+                    } else {
+                        cerr << "Line number out of range." << endl;
+                    }
                 }
-            }
-            else if (option == "RANGE" && args.size() == 4) {
-                int m = stoi(args[2]);
-                int n = stoi(args[3]);
-                int start = max(1, m);
-                int end = min(n, (int)lines.size());
-                for (int i = start - 1; i < end; ++i) {
-                    cout << lines[i] << endl;
+                else if (option == "RANGE" && args.size() == 4) {
+                    int m = stoi(args[2]);
+                    int n = stoi(args[3]);
+                    int start = max(1, m);
+                    int end = min(n, (int)lines.size());
+                    for (int i = start - 1; i < end; ++i) {
+                        cout << lines[i] << endl;
+                    }
                 }
+            } catch (...) {
+                cerr << "Error: Numeric argument expected but received invalid text." << endl;
             }
         }
     }

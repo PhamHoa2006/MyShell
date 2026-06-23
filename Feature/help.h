@@ -1,235 +1,265 @@
-// ============================================================================
-// help.h — Help System (Role 4)
-// ============================================================================
-// Command to implement:
-//   help           — Show all available commands
-//   help <command> — Show help for a specific command
-//
-// NOTE: This file is owned by Role 4 (System & Shell Utilities).
-// You need to coordinate with ALL other roles to document their commands.
-// This is the user-facing documentation for the entire shell.
-//
-// Reference: ../Operating-System-Projects/Feature/help.h
-// ============================================================================
-
 #ifndef HELP_H
 #define HELP_H
 
+#include <iomanip>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <iomanip>
 
-void showHelp(const std::vector<std::string>& args)
-{
-    // TODO: Implement
-    // If args is empty → print a table of ALL commands with descriptions
-    // If args has a command name → print detailed help for that command
-    //
-    // Commands to document (coordinate with each role):
-    //
-    // Role 1 — Core:
-    //   exit                       Quit the shell
-    //   history                    Show command history
-    //   clear_history              Clear command history
-    //
-    // Role 2 — File System:
-    //   cd <path>                  Change directory
-    //   pwd                        Print working directory
-    //   dir [path]                 List directory contents
-    //   create_file <name>         Create a new file
-    //   delete_file <name>         Delete a file
-    //   read_file <name>           Read a file's contents
-    //   copy_file <src> <dst>      Copy a file
-    //   write_file <text> <name>   Write text to a file
-    //   mkdir <name>               Create a directory
-    //   rmdir <name>               Remove a directory
-    //   list_tree [path]           Show directory tree
-    //
-    // Role 3 — Process:
-    //   start_foreground <exe>     Start a process and wait
-    //   start_background <exe>     Start a process in background
-    //   list                       List background processes (PID, name, status)
-    //   list_processes             List all system processes
-    //   terminate <PID>            Kill a process
-    //   suspend <PID>              Pause a process
-    //   resume <PID>               Resume a paused process
-    //
-    // Role 4 — Utilities:
-    //   time                       Show current time
-    //   date                       Show current date
-    //   path                       Show PATH variable
-    //   addpath <dir>              Add directory to PATH
-    //   set_env <var> <value>      Set environment variable
-    //   unset_env <var>            Remove environment variable
-    //   print_env <var>            Print an environment variable
-    //   run <file.bat>             Execute a batch file
-    //   help                       Show this help
-    if (args.empty()) {
-        std::cout << "=================================================================" << std::endl;
-        std::cout << "                   SMALL SHELL - AVAILABLE COMMANDS              " << std::endl;
-        std::cout << "=================================================================" << std::endl;
-        
-        // Cài đặt độ rộng cột lệnh là 25 ký tự, cột mô tả căn lề trái
-        std::cout << std::left << std::setw(25) << "COMMAND" << "DESCRIPTION" << std::endl;
-        std::cout << "-----------------------------------------------------------------" << std::endl;
+void showHelp(const std::vector<std::string> &args) {
+  if (args.empty()) {
+    std::cout
+        << "================================================================="
+        << std::endl;
+    std::cout
+        << "                   MY SHELL - AVAILABLE COMMANDS              "
+        << std::endl;
+    std::cout
+        << "================================================================="
+        << std::endl;
 
-        // Role 1 - Core Commands
-        std::cout << std::setw(25) << "exit" << "Quit the shell" << std::endl;
-        std::cout << std::setw(25) << "history" << "Show command history" << std::endl;
-        std::cout << std::setw(25) << "clear_history" << "Clear command history" << std::endl;
+    std::cout << std::left << std::setw(25) << "COMMAND" << "DESCRIPTION"
+              << std::endl;
+    std::cout
+        << "-----------------------------------------------------------------"
+        << std::endl;
 
-        // Role 2 - File System Commands
-        std::cout << std::setw(25) << "cd <path>" << "Change directory" << std::endl;
-        std::cout << std::setw(25) << "pwd" << "Print current working directory" << std::endl;
-        std::cout << std::setw(25) << "dir [path]" << "List directory contents" << std::endl;
-        std::cout << std::setw(25) << "create_file <name>" << "Create a new file" << std::endl;
-        std::cout << std::setw(25) << "delete_file <name>" << "Delete a file" << std::endl;
-        std::cout << std::setw(25) << "read_file <name>" << "Read a file's contents" << std::endl;
-        std::cout << std::setw(25) << "copy_file <src> <dst>" << "Copy a file" << std::endl;
-        std::cout << std::setw(25) << "write_file <text> <name>" << "Write text to a file" << std::endl;
-        std::cout << std::setw(25) << "mkdir <name>" << "Create a directory" << std::endl;
-        std::cout << std::setw(25) << "rmdir <name>" << "Remove a directory" << std::endl;
-        std::cout << std::setw(25) << "list_tree [path]" << "Show directory tree" << std::endl;
+    // Role 1 - Core Commands
+    std::cout << std::setw(25) << "help" << "Show this help menu" << std::endl;
+    std::cout << std::setw(25) << "history" << "Show command history"
+              << std::endl;
+    std::cout << std::setw(25) << "clear_history" << "Clear command history"
+              << std::endl;
+    std::cout << std::setw(25) << "exit / quit" << "Quit the shell"
+              << std::endl;
 
-        // Role 3 - Process Commands
-        std::cout << std::setw(25) << "start_foreground <exe>" << "Start a process and wait for it" << std::endl;
-        std::cout << std::setw(25) << "start_background <exe>" << "Start a process in the background" << std::endl;
-        std::cout << std::setw(25) << "list" << "List background processes (PID, name, status)" << std::endl;
-        std::cout << std::setw(25) << "list_processes" << "List all system processes" << std::endl;
-        std::cout << std::setw(25) << "terminate <PID>" << "Kill a process" << std::endl;
-        std::cout << std::setw(25) << "suspend <PID>" << "Pause a process" << std::endl;
-        std::cout << std::setw(25) << "resume <PID>" << "Resume a paused process" << std::endl;
+    // Role 2 - Navigation & File System
+    std::cout << std::setw(25) << "cd <path>" << "Change directory"
+              << std::endl;
+    std::cout << std::setw(25) << "pwd" << "Print current working directory"
+              << std::endl;
+    std::cout << std::setw(25) << "dir / ls" << "List directory contents"
+              << std::endl;
+    std::cout << std::setw(25) << "mkfile <name>" << "Create a new file"
+              << std::endl;
+    std::cout << std::setw(25) << "del / rm <name>" << "Delete a file"
+              << std::endl;
+    std::cout << std::setw(25) << "cat / type <name>"
+              << "Read a file's contents" << std::endl;
+    std::cout << std::setw(25) << "write / echo" << "Write text to a file"
+              << std::endl;
+    std::cout << std::setw(25) << "move / mv" << "Move a file" << std::endl;
+    std::cout << std::setw(25) << "rename / ren" << "Rename a file"
+              << std::endl;
+    std::cout << std::setw(25) << "size <name>" << "Get file size" << std::endl;
+    std::cout << std::setw(25) << "start <name>" << "Open file with default app"
+              << std::endl;
 
-        // Role 4 - Utilities
-        std::cout << std::setw(25) << "time" << "Show current system time" << std::endl;
-        std::cout << std::setw(25) << "date" << "Show current system date" << std::endl;
-        std::cout << std::setw(25) << "path" << "Show PATH variable" << std::endl;
-        std::cout << std::setw(25) << "addpath <dir>" << "Add directory to PATH" << std::endl;
-        std::cout << std::setw(25) << "set_env <var> <value>" << "Set environment variable" << std::endl;
-        std::cout << std::setw(25) << "unset_env <var>" << "Remove environment variable" << std::endl;
-        std::cout << std::setw(25) << "print_env <var>" << "Print an environment variable" << std::endl;
-        std::cout << std::setw(25) << "list_env" << "Print all environment variable" << std::endl;
-        std::cout << std::setw(25) << "run <file.bat>" << "Execute a batch file" << std::endl;
-        std::cout << std::setw(25) << "help" << "Show this help" << std::endl;
-        
-        std::cout << "==============================================================================\n";
-        std::cout << "Tip: Type 'help <command>' to view detailed manual for a specific command!\n";
-        return;
-    }
+    std::cout << std::setw(25) << "mkdir / md <name>" << "Create a directory"
+              << std::endl;
+    std::cout << std::setw(25) << "rmdir / rd <name>" << "Remove a directory"
+              << std::endl;
+    std::cout << std::setw(25) << "cpdir / xcopy"
+              << "Copy a directory recursively" << std::endl;
+    std::cout << std::setw(25) << "mvdir" << "Move a directory" << std::endl;
+    std::cout << std::setw(25) << "tree" << "Show directory tree" << std::endl;
 
-    std::string cmd = args[0];
-    std::cout << "\n------------------------------------------------------------------------------\n";
-    std::cout << " MANUAL PAGE: " << cmd << "\n";
-    std::cout << "------------------------------------------------------------------------------\n";
+    // Role 3 - Process Commands
+    std::cout << std::setw(25) << "start_foreground"
+              << "Start a process and wait" << std::endl;
+    std::cout << std::setw(25) << "start_background"
+              << "Start a process in the background" << std::endl;
+    std::cout << std::setw(25) << "list_background"
+              << "List MyShell background processes" << std::endl;
+    std::cout << std::setw(25) << "list_all_processes"
+              << "List all system OS processes" << std::endl;
+    std::cout << std::setw(25) << "terminate <PID>" << "Kill a process"
+              << std::endl;
+    std::cout << std::setw(25) << "suspend <PID>" << "Pause a process"
+              << std::endl;
+    std::cout << std::setw(25) << "resume <PID>" << "Resume a paused process"
+              << std::endl;
 
-    // --- ROLE 1 ---
-    if (cmd == "exit") {
-        std::cout << "Usage      : exit\n";
-        std::cout << "Description: Safely close the Small Shell prompt and return to Windows.\n";
-    } else if (cmd == "history") {
-        std::cout << "Usage      : history\n";
-        std::cout << "Description: Print a numbered list of all previously executed commands.\n";
-    } else if (cmd == "clear_history") {
-        std::cout << "Usage      : clear_history\n";
-        std::cout << "Description: Delete all recorded command history from the history.txt file.\n";
-    }
-    // --- ROLE 2 ---
-    else if (cmd == "cd") {
-        std::cout << "Usage      : cd <path>\n";
-        std::cout << "Description: Navigate the shell to a different directory path.\n";
-        std::cout << "Example    : cd C:/Users/Admin/Documents\n";
-    } else if (cmd == "pwd") {
-        std::cout << "Usage      : pwd\n";
-        std::cout << "Description: Display the absolute path of the current working directory.\n";
-    } else if (cmd == "dir") {
-        std::cout << "Usage      : dir [path]\n";
-        std::cout << "Description: List all files and subdirectories inside [path].\n";
-        std::cout << "             If [path] is omitted, lists current directory contents.\n";
-    } else if (cmd == "create_file") {
-        std::cout << "Usage      : create_file <name>\n";
-        std::cout << "Description: Create a brand new, empty regular file.\n";
-    } else if (cmd == "delete_file") {
-        std::cout << "Usage      : delete_file <name>\n";
-        std::cout << "Description: Permanently delete a specified target file.\n";
-    } else if (cmd == "read_file") {
-        std::cout << "Usage      : read_file <name>\n";
-        std::cout << "Description: Open the target file and print all its raw text to console.\n";
-    } else if (cmd == "copy_file") {
-        std::cout << "Usage      : copy_file <src> <dst>\n";
-        std::cout << "Description: Duplicate a file from Source path to Destination path.\n";
-    } else if (cmd == "write_file") {
-        std::cout << "Usage      : write_file <text> <name>\n";
-        std::cout << "Description: Insert or append a string of text into the target file.\n";
-    } else if (cmd == "mkdir") {
-        std::cout << "Usage      : mkdir <name>\n";
-        std::cout << "Description: Create a new empty folder/directory.\n";
-    } else if (cmd == "rmdir") {
-        std::cout << "Usage      : rmdir <name>\n";
-        std::cout << "Description: Remove an existing directory from the file system.\n";
-    } else if (cmd == "list_tree") {
-        std::cout << "Usage      : list_tree [path]\n";
-        std::cout << "Description: Render the directory structure visually as an ASCII tree.\n";
-    }
-    // --- ROLE 3 ---
-    else if (cmd == "start_foreground") {
-        std::cout << "Usage      : start_foreground <executable_path>\n";
-        std::cout << "Description: Launch a child program and FREEZE the shell until it finishes.\n";
-    } else if (cmd == "start_background") {
-        std::cout << "Usage      : start_background <executable_path>\n";
-        std::cout << "Description: Launch a child program in the background. Shell stays active.\n";
-    } else if (cmd == "list") {
-        std::cout << "Usage      : list\n";
-        std::cout << "Description: Display internal tracking table of background jobs launched by MyShell.\n";
-        std::cout << "             Outputs: [Internal PID] | [Command Name] | [Status]\n";
-    } else if (cmd == "list_processes") {
-        std::cout << "Usage      : list_processes\n";
-        std::cout << "Description: Snapshot and list ALL running processes currently live in Windows OS.\n";
-    } else if (cmd == "terminate") {
-        std::cout << "Usage      : terminate <PID>\n";
-        std::cout << "Description: Forcefully send a kill signal to terminate process matching <PID>.\n";
-    } else if (cmd == "suspend") {
-        std::cout << "Usage      : suspend <PID>\n";
-        std::cout << "Description: Freeze all executing threads of a target process.\n";
-    } else if (cmd == "resume") {
-        std::cout << "Usage      : resume <PID>\n";
-        std::cout << "Description: Unfreeze all suspended threads of a target process.\n";
-    }
-    // --- ROLE 4 ---
-    else if (cmd == "time") {
-        std::cout << "Usage      : time\n";
-        std::cout << "Description: Query Windows OS and output current local time (HH:MM:SS).\n";
-    } else if (cmd == "date") {
-        std::cout << "Usage      : date\n";
-        std::cout << "Description: Query Windows OS and output current local date (DD/MM/YYYY).\n";
-    } else if (cmd == "path") {
-        std::cout << "Usage      : path\n";
-        std::cout << "Description: Print out all stored paths registered in the OS PATH variable.\n";
-    } else if (cmd == "addpath") {
-        std::cout << "Usage      : addpath <directory_path>\n";
-        std::cout << "Description: Dynamically append a new folder path into the system PATH.\n";
-    } else if (cmd == "set_env") {
-        std::cout << "Usage      : set_env <variable_name> <value>\n";
-        std::cout << "Description: Assign an internal environment variable & sync it to Windows OS.\n";
-    } else if (cmd == "unset_env") {
-        std::cout << "Usage      : unset_env <variable_name>\n";
-        std::cout << "Description: Erase an environment variable from the shell memory and OS scope.\n";
-    } else if (cmd == "print_env") {
-        std::cout << "Usage      : print_env <variable_name>\n";
-        std::cout << "Description: Lookup and print the stored value of a specific environment variable.\n";
-    } else if (cmd == "run") {
-        std::cout << "Usage      : run <script_file.bat>\n";
-        std::cout << "Description: Read a batch script line-by-line and dispatch them to the shell engine.\n";
-    } else if (cmd == "help") {
-        std::cout << "Usage      : help [command_name]\n";
-        std::cout << "Description: The manual system you are looking at right now.\n";
-    } else {
-        std::cout << "Error: No manual entry found for command '" << cmd << "'.\n";
-        std::cout << "Type 'help' without arguments to see the valid list of 30 commands.\n";
-    }
-    std::cout << "------------------------------------------------------------------------------\n\n";
+    // Role 4 - Utilities
+    std::cout << std::setw(25) << "time" << "Show current system time"
+              << std::endl;
+    std::cout << std::setw(25) << "date" << "Show current system date"
+              << std::endl;
+    std::cout << std::setw(25) << "path" << "Show PATH variable" << std::endl;
+    std::cout << std::setw(25) << "addpath <dir>" << "Add directory to PATH"
+              << std::endl;
+    std::cout << std::setw(25) << "set_env" << "Set environment variable"
+              << std::endl;
+    std::cout << std::setw(25) << "unset_env <var>"
+              << "Remove environment variable" << std::endl;
+    std::cout << std::setw(25) << "print_env <var>"
+              << "Print an environment variable" << std::endl;
+    std::cout << std::setw(25) << "list_env"
+              << "Print all environment variables" << std::endl;
+    std::cout << std::setw(25) << "run <file.bat>" << "Execute a batch script"
+              << std::endl;
 
+    std::cout << "============================================================="
+                 "=================\n";
+    std::cout << "Tip: Type 'help <command>' to view detailed manual for a "
+                 "specific command!\n";
+    return;
+  }
 
+  std::string cmd = args[0];
+  std::cout << "\n-------------------------------------------------------------"
+               "-----------------\n";
+  std::cout << " MANUAL PAGE: " << cmd << "\n";
+  std::cout << "---------------------------------------------------------------"
+               "---------------\n";
+
+  // --- ROLE 1 ---
+  if (cmd == "exit" || cmd == "quit") {
+    std::cout << "Usage      : exit\n";
+    std::cout << "Description: Safely close the shell and terminate all "
+                 "background child processes.\n";
+  } else if (cmd == "history") {
+    std::cout << "Usage      : history\n";
+    std::cout << "Description: Print a numbered list of all previously "
+                 "executed commands.\n";
+  } else if (cmd == "clear_history") {
+    std::cout << "Usage      : clear_history\n";
+    std::cout << "Description: Delete all recorded command history.\n";
+  }
+  // --- ROLE 2 ---
+  else if (cmd == "cd") {
+    std::cout << "Usage      : cd <path>\n";
+    std::cout
+        << "Description: Navigate the shell to a different directory path.\n";
+  } else if (cmd == "pwd") {
+    std::cout << "Usage      : pwd\n";
+    std::cout << "Description: Display the absolute path of the current "
+                 "working directory.\n";
+  } else if (cmd == "dir" || cmd == "ls") {
+    std::cout << "Usage      : dir [path]\n";
+    std::cout
+        << "Description: List all files and subdirectories inside [path].\n";
+  } else if (cmd == "mkfile") {
+    std::cout << "Usage      : mkfile <name>\n";
+    std::cout << "Description: Create a brand new, empty regular file.\n";
+  } else if (cmd == "del" || cmd == "rm") {
+    std::cout << "Usage      : del <name>\n";
+    std::cout << "Description: Permanently delete a specified target file.\n";
+  } else if (cmd == "cat" || cmd == "type") {
+    std::cout << "Usage      : cat <name>\n";
+    std::cout << "Description: Open the target file and print all its raw text "
+                 "to console.\n";
+  } else if (cmd == "write" || cmd == "echo") {
+    std::cout << "Usage      : write <text> <name>\n";
+    std::cout << "Description: Insert or append a string of text into the "
+                 "target file.\n";
+  } else if (cmd == "move" || cmd == "mv") {
+    std::cout << "Usage      : move <src> <dst>\n";
+    std::cout << "Description: Move a file to a new location.\n";
+  } else if (cmd == "rename" || cmd == "ren") {
+    std::cout << "Usage      : rename <old_name> <new_name>\n";
+    std::cout << "Description: Rename an existing file.\n";
+  } else if (cmd == "start") {
+    std::cout << "Usage      : start <name>\n";
+    std::cout << "Description: Open the file using the default Windows "
+                 "application.\n";
+  } else if (cmd == "size") {
+    std::cout << "Usage      : size <name>\n";
+    std::cout << "Description: Get the size of the file in bytes.\n";
+  } else if (cmd == "mkdir" || cmd == "md") {
+    std::cout << "Usage      : mkdir <name>\n";
+    std::cout << "Description: Create a new empty folder/directory.\n";
+  } else if (cmd == "rmdir" || cmd == "rd") {
+    std::cout << "Usage      : rmdir <name>\n";
+    std::cout
+        << "Description: Remove an existing directory from the file system.\n";
+  } else if (cmd == "cpdir" || cmd == "xcopy") {
+    std::cout << "Usage      : cpdir <src> <dst>\n";
+    std::cout
+        << "Description: Copy a directory and all its contents recursively.\n";
+  } else if (cmd == "mvdir") {
+    std::cout << "Usage      : mvdir <src> <dst>\n";
+    std::cout << "Description: Move a directory to a new location.\n";
+  } else if (cmd == "tree") {
+    std::cout << "Usage      : tree [path]\n";
+    std::cout << "Description: Render the directory structure visually as an "
+                 "ASCII tree.\n";
+  }
+  // --- ROLE 3 ---
+  else if (cmd == "start_foreground") {
+    std::cout << "Usage      : start_foreground <executable_path>\n";
+    std::cout << "Description: Launch a child program and FREEZE the shell "
+                 "until it finishes.\n";
+  } else if (cmd == "start_background") {
+    std::cout << "Usage      : start_background <executable_path>\n";
+    std::cout << "Description: Launch a child program in the background. Shell "
+                 "stays active.\n";
+  } else if (cmd == "list_background") {
+    std::cout << "Usage      : list_background\n";
+    std::cout << "Description: Display tracking table of background jobs "
+                 "launched by MyShell.\n";
+  } else if (cmd == "list_all_processes") {
+    std::cout << "Usage      : list_all_processes\n";
+    std::cout << "Description: Snapshot and list ALL running processes "
+                 "currently live in Windows OS.\n";
+  } else if (cmd == "terminate") {
+    std::cout << "Usage      : terminate <PID>\n";
+    std::cout << "Description: Forcefully send a kill signal to terminate "
+                 "process matching <PID>.\n";
+  } else if (cmd == "suspend") {
+    std::cout << "Usage      : suspend <PID>\n";
+    std::cout
+        << "Description: Freeze all executing threads of a target process.\n";
+  } else if (cmd == "resume") {
+    std::cout << "Usage      : resume <PID>\n";
+    std::cout
+        << "Description: Unfreeze all suspended threads of a target process.\n";
+  }
+  // --- ROLE 4 ---
+  else if (cmd == "time") {
+    std::cout << "Usage      : time\n";
+    std::cout << "Description: Query Windows OS and output current local time "
+                 "(HH:MM:SS).\n";
+  } else if (cmd == "date") {
+    std::cout << "Usage      : date\n";
+    std::cout << "Description: Query Windows OS and output current local date "
+                 "(DD/MM/YYYY).\n";
+  } else if (cmd == "path") {
+    std::cout << "Usage      : path\n";
+    std::cout << "Description: Print out all stored paths registered in the OS "
+                 "PATH variable.\n";
+  } else if (cmd == "addpath") {
+    std::cout << "Usage      : addpath <directory_path>\n";
+    std::cout << "Description: Dynamically append a new folder path into the "
+                 "system PATH.\n";
+  } else if (cmd == "set_env") {
+    std::cout << "Usage      : set_env <variable_name> <value>\n";
+    std::cout << "Description: Assign an internal environment variable & sync "
+                 "it to Windows OS.\n";
+  } else if (cmd == "unset_env") {
+    std::cout << "Usage      : unset_env <variable_name>\n";
+    std::cout << "Description: Erase an environment variable from the shell "
+                 "memory and OS scope.\n";
+  } else if (cmd == "print_env") {
+    std::cout << "Usage      : print_env <variable_name>\n";
+    std::cout << "Description: Lookup and print the stored value of a specific "
+                 "environment variable.\n";
+  } else if (cmd == "list_env") {
+    std::cout << "Usage      : list_env\n";
+    std::cout << "Description: Print all stored shell environment variables.\n";
+  } else if (cmd == "run") {
+    std::cout << "Usage      : run <script_file.bat>\n";
+    std::cout << "Description: Read a batch script line-by-line and dispatch "
+                 "them to the shell engine.\n";
+  } else if (cmd == "help") {
+    std::cout << "Usage      : help [command_name]\n";
+    std::cout
+        << "Description: The manual system you are looking at right now.\n";
+  } else {
+    std::cout << "Error: No manual entry found for command '" << cmd << "'.\n";
+  }
+  std::cout << "---------------------------------------------------------------"
+               "---------------\n\n";
 }
 
 #endif // HELP_H
