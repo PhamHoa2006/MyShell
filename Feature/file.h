@@ -34,6 +34,10 @@ public:
 
     void fileSize(const vector<string>& fileNames){
         for (const auto& fileName : fileNames) {
+            if (fs::is_directory(fileName)){
+                cout << "Not file";
+                return;
+            }
             if (fs::exists(fileName)) {
                 cout << "Size of file " << fileName << ": " << fs::file_size(fileName) << " bytes" << endl;
             } else {
@@ -69,15 +73,18 @@ public:
             }
         }
     }
-
-    void openFile(const vector<string>& fileNames){
-        for(const auto& fileName : fileNames){
-            if (fs::exists(fileName)){
-                ShellExecuteA(NULL, "open", fileName.c_str(), NULL, NULL, SW_SHOWNORMAL);
-                cout << "File opened: " << fileName << endl;
-            }
-            else {
-                cerr << "File does not exist: " << fileName << endl;
+    void openFile(const vector<string>& fileNames) {
+        for (const auto& fileName : fileNames) {
+            
+            // Gọi ShellExecuteA trực tiếp. Nếu thành công, nó trả về một giá trị > 32
+            HINSTANCE result = ShellExecuteA(NULL, "open", fileName.c_str(), NULL, NULL, SW_SHOWNORMAL);
+            
+            // Ép kiểu về INT_PTR để kiểm tra lỗi
+            if ((INT_PTR)result > 32) {
+                cout << "Successfully opened/executed: " << fileName << endl;
+            } else {
+                // Nếu thất bại (có thể do file không tồn tại, hoặc không có ứng dụng nào hỗ trợ mở)
+                cerr << "Failed to open or execute: " << fileName << " (Error code: " << (INT_PTR)result << ")" << endl;
             }
         }
     }

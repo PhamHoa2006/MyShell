@@ -3,12 +3,10 @@
 #include <windows.h>
 #include <vector>
 #include <sstream>
-
+#include <direct.h>  // Thư viện bắt buộc trên Windows để dùng _getcwd
+#include <stdlib.h>  // Thư viện để dùng hàm _MAX_PATH
 // Include your new process.h and Role 2's headers
-#include "Feature/process.h" 
-#include "Feature/navigation.h"
-#include "Feature/file.h"
-#include "Feature/directory.h"
+#include "Feature/feature.h"
 
 using namespace std;    
 
@@ -114,7 +112,15 @@ int main(){
     
     // 3. The REPL (Read-Evaluate-Print Loop)
     while (true) {
-        cout << "\nMyShell> ";
+        char cwd[_MAX_PATH];
+        
+        // Gọi hàm _getcwd (có dấu gạch dưới ở trước)
+        if (_getcwd(cwd, sizeof(cwd)) != NULL) {
+            cout << "\n" << cwd << " > ";
+        } else {
+            // Phòng trường hợp lỗi xảy ra
+            cout << "\nMyShell > ";
+        }
         string input;
         
         // Read the entire line from user
