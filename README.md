@@ -4,7 +4,7 @@ A command-line shell built in C++ for the Operating System course.
 
 ## Team Members
 
-> TODO: Xuan Son, Pham Hoa, Viet Tung, Pham Khanh
+> Xuan Son, Pham Hoa, Viet Tung, Pham Khanh
 
 **👉 See [TEAM_TASKS.md](TEAM_TASKS.md) for how the workload is divided among the 4 team members.**
 
@@ -24,11 +24,11 @@ MyShell/
 │   ├── history.h               # Command history
 │   └── help.h                  # Help system
 ├── Process/                    # Separate child process executables
-│   ├── child.cpp               # TODO: Minimal child process
-│   └── countdown.cpp           # TODO: Countdown timer
+│   ├── child.cpp               # Minimal child process
+│   └── countdown.cpp           # Countdown timer
 ├── Testcase/                   # Test scripts
 │   └── test_basic.bat          # Test commands (runs via .bat execution feature)
-├── LEARN.md                    # 📖 Learning guide — APIs & libraries reference
+├── USER_MANUAL.md              # 📖 Complete tutorial and list of all commands
 └── README.md                   # This file
 ```
 
@@ -65,5 +65,5 @@ MyShell.exe
 
 ## Reference
 
-The reference TinyShell project is located at `../Operating-System-Projects/`.
-The learning guide is at [LEARN.md](LEARN.md).
+The reference TinyShell project is available at: [HaiAu2501/Operating-System-Projects](https://github.com/HaiAu2501/Operating-System-Projects).
+For a complete tutorial of all commands, see [USER_MANUAL.md](USER_MANUAL.md).

@@ -33,7 +33,6 @@ namespace fs = std::filesystem;
 // Don't forget to check if the path exists first!
 void changeDirectory(const std::vector<std::string>& args)
 {
-    // TODO: Implement this function
     // Steps:
     // 1. Check if args is empty → print usage: "Usage: cd <path>"
     // 2. Check if args[0] is a valid path → fs::exists(args[0])
@@ -75,7 +74,6 @@ void changeDirectory(const std::vector<std::string>& args)
 // API to use: fs::current_path()
 void printWorkingDirectory(const std::vector<std::string>& args)
 {
-    // TODO: Implement this function
     // Just one line: cout << fs::current_path() << endl;
     cout << fs::current_path() << endl;
 
@@ -86,7 +84,6 @@ void printWorkingDirectory(const std::vector<std::string>& args)
 // API to use: fs::directory_iterator
 void listDirectoryContents(const std::vector<std::string>& args)
 {
-    // TODO: Implement this function
     // Steps:
     // 1. Determine which path to list:
     //    - If args is empty → use fs::current_path()

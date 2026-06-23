@@ -40,7 +40,6 @@ public:
     // --- create_dir <path> ---
     void createDirectory(const vector<string>& args)
     {
-        // TODO: Implement this function
         // Steps:
         // 1. Check if args is empty
         // 2. Use fs::create_directories(args[0])
@@ -65,7 +64,6 @@ public:
     // --- delete_dir <path> ---
     void deleteDirectory(const vector<string>& args)
     {
-        // TODO: Implement this function
         // Steps:
         // 1. Check if the directory exists: fs::exists(args[0])
         // 2. Use fs::remove_all(args[0]) to delete the folder AND everything inside it
@@ -90,7 +88,6 @@ public:
     // --- copy_dir <src> <dst> ---
     void copyDirectory(const vector<string>& args)
     {
-        // TODO: Implement this function
         // Steps:
         // 1. Check if you have exactly 2 arguments
         if (args.size() != 2) {
@@ -132,7 +129,6 @@ public:
     // --- move_dir <src> <dst> ---
     void moveDirectory(const vector<string>& args)
     {
-        // TODO: Implement this function
         // Steps:
         // 1. Check if you have exactly 2 arguments
         // 2. Use fs::rename(args[0], args[1])
@@ -179,7 +175,6 @@ public:
     // Print a visual tree of the directory structure
     void listTree(const vector<string>& args)
     {
-        // TODO: Implement this function
         // 1. Determine starting path (current_path if args empty, else args[0])
         // 2. Call a recursive helper function to print the tree
         //
@@ -205,7 +200,6 @@ private:
     // Helper function for listTree
     void printTreeRecursive(const fs::path& path, const string& prefix)
     {
-        // TODO: Implement the recursion logic here
         // 1. List all entries in the directory using fs::directory_iterator
         // 2. For each entry, print the prefix + "├── " + entry name
         // 3. If the entry is a directory, call printTreeRecursive on it with an updated prefix

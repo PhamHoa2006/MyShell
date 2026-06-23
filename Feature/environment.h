@@ -41,7 +41,6 @@ public:
     // --- set_env <var> = <value> ---
     void setEnv(const std::string& var, const std::string& value)
     {
-        // TODO: Implement
         // 1. Store in local map: envVariables[var] = value
         // 2. Also set in OS: _putenv_s(var.c_str(), value.c_str())
 
@@ -63,7 +62,6 @@ public:
     // --- unset_env <var> ---
     void unsetEnv(const std::string& var)
     {
-        // TODO: Implement
         // 1. Remove from local map
         // 2. Set to empty in OS: _putenv_s(var.c_str(), "")
         if (var.empty()) {
@@ -84,7 +82,6 @@ public:
     // --- print_env <var> ---
     void printEnv(const std::string& var)
     {
-        // TODO: Implement
         // 1. Check local map first
         // 2. If not found, try getenv(var.c_str())
         if (var.empty()) {
@@ -104,7 +101,6 @@ public:
     // --- list_env ---
     void listAllEnv()
     {
-        // TODO: Implement
         // Iterate over envVariables map and print each
 
         std::cout << "--- Local Shell Environment Variables ---\n";
@@ -121,7 +117,6 @@ public:
     // --- getEnv (helper, used by VariableManager) ---
     std::string getEnv(const std::string& var)
     {
-        // TODO: Implement
         // 1. Check local map first
         // 2. If not found, try getenv()
         // 3. Return value or empty string
