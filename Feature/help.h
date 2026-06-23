@@ -109,6 +109,7 @@ void showHelp(const std::vector<std::string>& args)
         std::cout << std::setw(25) << "set_env <var> <value>" << "Set environment variable" << std::endl;
         std::cout << std::setw(25) << "unset_env <var>" << "Remove environment variable" << std::endl;
         std::cout << std::setw(25) << "print_env <var>" << "Print an environment variable" << std::endl;
+        std::cout << std::setw(25) << "list_env" << "Print all environment variable" << std::endl;
         std::cout << std::setw(25) << "run <file.bat>" << "Execute a batch file" << std::endl;
         std::cout << std::setw(25) << "help" << "Show this help" << std::endl;
         

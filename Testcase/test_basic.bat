@@ -4,7 +4,6 @@
 :: Usage inside Small Shell: run Testcase\test_basic.bat
 :: ============================================================================
 
-
 time
 date
 path
@@ -14,6 +13,7 @@ set_env OS_PROJECT_SCORE 10_Points
 print_env OS_PROJECT_SCORE
 unset_env OS_PROJECT_SCORE
 print_env OS_PROJECT_SCORE
+list_env
 
 
 pwd
