@@ -3,3 +3,5 @@ Practice/
 *.exe
 main
 history.txt
+compile_flags.txt
+.vscode
