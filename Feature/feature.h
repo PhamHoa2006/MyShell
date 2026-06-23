@@ -9,6 +9,7 @@
 // Add new #include lines here as you create new feature files.
 // ============================================================================
 
+#ifndef TEST_ROLE1
 // --- File & Directory Management (Role 2) ---
 #include "file.h"           // File operations (partially implemented ✅)
 #include "directory.h"      // Directory operations (empty stub)
@@ -22,6 +23,8 @@
 
 // --- System & Shell Utilities (Role 4) ---
 #include "system_utils.h"   // time, date, .bat file execution
+#endif
+
 #include "help.h"           // Help system — documents all commands
 
 // --- Command History (Role 1) ---
