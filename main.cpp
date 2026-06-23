@@ -2,23 +2,18 @@
 // main.cpp — Master Engine (Hợp nhất code nhánh Sơn + Role 4 + Role 1)
 // ============================================================================
 
-#include <windows.h> // Include this FIRST to fix std::byte ambiguity
 #include <csignal>
+#include <direct.h> // Thư viện bắt buộc trên Windows để dùng _getcwd
 #include <filesystem>
 #include <iostream>
 #include <sstream>
+#include <stdlib.h> // Thư viện để dùng hàm _MAX_PATH
 #include <string>
 #include <vector>
+#include <windows.h> // Include this FIRST to fix std::byte ambiguity
 
-
-// --- ROLE 1 ---
-#include "Feature/history.h"
-
-// --- ROLE 2 ---
-#include "Feature/directory.h"
-#include "Feature/file.h"
-#include "Feature/navigation.h"
-
+// Include your new process.h and Role 2's headers
+#include "Feature/feature.h"
 
 // --- ROLE 3 ---
 #include "Feature/process.h"
@@ -27,7 +22,6 @@
 #include "Feature/environment.h"
 #include "Feature/help.h"
 #include "Feature/system_utils.h"
-
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -204,7 +198,15 @@ int main() {
   print_startup_info();
 
   while (true) {
-    cout << "\nMyShell> ";
+    char cwd[_MAX_PATH];
+
+    // Gọi hàm _getcwd (có dấu gạch dưới ở trước)
+    if (_getcwd(cwd, sizeof(cwd)) != NULL) {
+      cout << "\n" << cwd << " > ";
+    } else {
+      // Phòng trường hợp lỗi xảy ra
+      cout << "\nMyShell > ";
+    }
     string input;
 
     if (!getline(cin, input))

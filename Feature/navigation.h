@@ -52,7 +52,6 @@ void changeDirectory(const std::vector<std::string>& args)
     else if (newPath == "..") {
         // Move up to the parent directory
         newPath = fs::current_path().parent_path();
-        return;
     }
     try {
         if (!fs::exists(newPath)) {
