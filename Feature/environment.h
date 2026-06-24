@@ -35,7 +35,7 @@
 #include <map>
 #include <string>
 #include <vector>
-
+#include <sstream>
 
 class EnvironmentManager {
 public:
