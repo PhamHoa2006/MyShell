@@ -155,7 +155,9 @@ public:
             return;
         }
         
-        DWORD targetPID = std::stoul(args[0]);
+        DWORD targetPID;
+        try { targetPID = std::stoul(args[0]); } 
+        catch (...) { std::cout << "Error: Invalid PID format. Must be a number." << std::endl; return; }
         std::cout << "Trying to terminate " << targetPID << " ..." << std::endl;
 
         HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, targetPID);
@@ -247,7 +249,9 @@ public:
             return;
         }
         
-        DWORD targetPID = std::stoul(args[0]);
+        DWORD targetPID;
+        try { targetPID = std::stoul(args[0]); } 
+        catch (...) { std::cout << "Error: Invalid PID format. Must be a number." << std::endl; return; }
         std::cout << "Trying to freeze: " << targetPID << "..." << std::endl;
         
         HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
@@ -294,7 +298,9 @@ public:
             return;
         }
         
-        DWORD targetPID = std::stoul(args[0]);
+        DWORD targetPID;
+        try { targetPID = std::stoul(args[0]); } 
+        catch (...) { std::cout << "Error: Invalid PID format. Must be a number." << std::endl; return; }
         std::cout << "Trying to resume " << targetPID << " ..." << std::endl;
 
         // Snapshot of all threads
