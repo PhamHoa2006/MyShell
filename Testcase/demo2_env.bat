@@ -14,4 +14,5 @@ list_env
 set_env PROJECT_MODE Presentation_Demo
 
 :: 5. Verify the variable was set correctly
-print_env PROJECT_MODE
+list_env
+

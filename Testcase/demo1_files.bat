@@ -11,7 +11,7 @@ cd Presentation
 mkfile config.txt
 
 :: 4. Write some initial data to the file
-write "Project initialized successfully!" config.txt
+write "Project-initialized-successfully!" config.txt
 
 :: 5. Read the file to verify its contents
 cat config.txt
@@ -28,5 +28,3 @@ tree
 :: ==========================================
 :: CLEANUP: Remove folders so the script can be run again safely
 :: ==========================================
-rmdir Presentation
-rmdir Backup_Presentation
