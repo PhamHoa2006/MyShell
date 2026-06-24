@@ -66,7 +66,7 @@ void print_startup_info() {
        << endl;
 }
 
-// BỘ TÁCH TỪ THÔNG MINH (Nâng cấp từ code của Sơn để hiểu được dấu " ")
+// BỘ TÁCH TỪ  (Nâng cấp từ code của Sơn để hiểu được dấu " ")
 vector<string> split_input(const string &input) {
   vector<string> tokens;
   string current_token;

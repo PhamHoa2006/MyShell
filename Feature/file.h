@@ -188,7 +188,7 @@ public:
                 cout << l << endl;
             }
         }
-        else if (args.size() >= 3) {
+        else if (args.size() >= 2) {
             string option = args[1];
             if (option == "HEAD") {
                 int numLines = stoi(args[2]);
